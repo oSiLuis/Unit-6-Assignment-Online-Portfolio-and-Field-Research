@@ -1,0 +1,278 @@
+/* A  Restaurant Project Struct style Dr_T Dr. Tyson McMillan 10-2-2019
+ Converted menu into a class format from strcut format by Luis Soto 4/29/2024
+ 2024SP COSC-1437-58002
+*/
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <iomanip>
+using namespace std;
+
+class MenuItem {
+private:
+    string name;
+    double itemCost;
+    string desc;
+    char addLetter;
+    char removeLetter;
+    int count;
+
+public:
+    // Constructor
+    MenuItem(string _name, double _itemCost, string _desc, char _addLetter, char _removeLetter)
+        : name(_name), itemCost(_itemCost), desc(_desc), addLetter(_addLetter), removeLetter(_removeLetter), count(0) {}
+
+    // Default Constructor
+    MenuItem() {}
+
+    // Setters
+    void setName(string _name) { name = _name; }
+    void setItemCost(double _itemCost) { itemCost = _itemCost; }
+    void setDesc(string _desc) { desc = _desc; }
+    void setAddLetter(char _addLetter) { addLetter = _addLetter; }
+    void setRemoveLetter(char _removeLetter) { removeLetter = _removeLetter; }
+    void setCount(int _count) { count = _count; }
+
+    // Getters
+    string getName() const { return name; }
+    double getItemCost() const { return itemCost; }
+    string getDesc() const { return desc; }
+    char getAddLetter() const { return addLetter; }
+    char getRemoveLetter() const { return removeLetter; }
+    int getCount() const { return count; }
+
+    // Function to increment count
+    void incrementCount() {
+        count++;
+    }
+
+    // Function to decrement count
+    void decrementCount() {
+        if (count > 0)
+            count--;
+    }
+};
+
+class Menu {
+private:
+    vector<MenuItem> entireMenu;
+
+public:
+    // Constructor to populate the menu
+    Menu() {
+        populateMenu();
+    }
+
+    // Function to populate the menu
+    void populateMenu() {
+        const int numItems = 7;
+        vector<string> defaultMenuNames = { "Green Tea", "Burrito", "Brisket", "Taco",
+                                            "Burger", "Apple Pie", "Fried Chicken"};
+        vector<char> defaultAddLetters = { 'A', 'B', 'C', 'D', 'E', 'F', 'G' };
+        vector<char> defaultRemoveLetters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
+        vector<string> defaultDescriptions = { "Refreshing", "Savory", "Tender and Juicy", 
+        "Spicy", "American Classic", "Sweet and Crispy", "Crispy & Flavorful" };
+
+        for (int i = 0; i < numItems; i++) {
+            MenuItem item(defaultMenuNames[i], 3.00 + i, defaultDescriptions[i], 
+             defaultAddLetters[i],
+             defaultRemoveLetters[i]);
+             entireMenu.push_back(item);
+        }
+    }
+
+    // Function to display the menu
+    void showMenu() {
+        cout << fixed << setprecision(2);
+        cout << "\033[1;33mDrT's Efficient Menu\033[0m" << endl; // Yellow color
+        cout << "\033[1;34mADD     NAME               COST   REMOVE  COUNT   DESC\033[0m" << endl; // Blue color for headers
+        for (int i = 0; i < entireMenu.size(); i++) {
+            cout << "\033[1;47m" << entireMenu[i].getAddLetter() << ")  " << setw(17) << left 
+            << entireMenu[i].getName() // background White color for menu items
+            << "$" << setw(7) << right << entireMenu[i].getItemCost() << "    ("
+            << entireMenu[i].getRemoveLetter() << ")        " << setw(3) << right <<
+            entireMenu[i].getCount()
+            << "    " << entireMenu[i].getDesc() << "\033[0m" << endl; // Reset color after each line
+        }
+    }
+
+    // Function to accept order
+    void acceptOrder() {
+        char option = '\0';
+        double subtotal = 0.0;
+
+        do {
+            cout << "\nPlease choose an item (x to Exit): ";
+            cin >> option;
+
+            bool optionMatched = false; // Flag variable to track if the option matches any item
+
+            for (int i = 0; i < entireMenu.size(); i++) {
+                if (option == entireMenu[i].getAddLetter()) {
+                    cout << "\nMenu Item " << entireMenu[i].getAddLetter() << " selected.";
+                    entireMenu[i].incrementCount();
+                    cout << "\033[2J\033[1;1H"; // Clear screen
+                    cout << "\n1 UP on " << entireMenu[i].getName() << endl;
+                    subtotal += entireMenu[i].getItemCost();
+                    showMenu();
+                    cout << "\nSubtotal: $" << subtotal << endl;
+                    optionMatched = true;
+                    break; // Exit the loop once a match is found
+                }
+                else if (option == entireMenu[i].getRemoveLetter()) {
+                    cout << "\nRemove Item " << entireMenu[i].getRemoveLetter() << " selected.";
+                    if (entireMenu[i].getCount() > 0) {
+                        entireMenu[i].decrementCount();
+                        cout << "\033[2J\033[1;1H"; // Clear screen
+                        cout << "\n1 DOWN on " << entireMenu[i].getName() << endl;
+                        subtotal -= entireMenu[i].getItemCost();
+                        showMenu();
+                        cout << "\nSubtotal: $" << subtotal << endl;
+                    }
+                    else {
+                        cout << "\nNo items of " << entireMenu[i].getName() << " to remove." << endl;
+                    }
+                    optionMatched = true;
+                    break; // Exit the loop once a match is found
+                }
+            }
+
+            if (!optionMatched && option != 'x') {
+                cout << "\nInvalid option. Please choose a valid item from the menu." << endl;
+            }
+
+        } while (option != 'x');
+
+        printReceipt(subtotal);
+    }
+
+    // Function to print receipt
+    void printReceipt(double subtotal) {
+        double taxRate = 0.08;
+        double tax = subtotal * taxRate;
+        double total = subtotal + tax;
+
+        cout << "\033[2J\033[1;1H"; // Clear screen
+        cout << "RECEIPT" << endl;
+        cout << "-------" << endl;
+        cout << fixed << setprecision(2);
+        for (int i = 0; i < entireMenu.size(); i++) {
+            if (entireMenu[i].getCount() > 0) {
+                cout << entireMenu[i].getName() << " (" << entireMenu[i].getCount() << "): $"
+                     << (entireMenu[i].getItemCost() * entireMenu[i].getCount()) << endl;
+            }
+        }
+        cout << "Subtotal: $" << subtotal << endl;
+        cout << "Tax (" << (taxRate * 100) << "%): $" << tax << endl;
+        cout << "Total: $" << total << endl;
+
+        acceptTip(total);
+    }
+
+    // Function to accept tip
+    void acceptTip(double total) {
+        double tip = total * 0.2;
+
+        cout << "\nSuggested Tip: $" << tip << endl;
+        cout << "Enter your preferred tip amount (0 if none): ";
+        double customTip;
+        cin >> customTip;
+
+        if (customTip > 0) {
+            tip = customTip;
+        }
+
+        cout << fixed << setprecision(2);
+        cout << "Tip: $" << tip << endl;
+        cout << "Grand Total: $" << (total + tip) << endl;
+
+        acceptPayment(total + tip);
+    }
+
+    // Function to accept payment
+    void acceptPayment(double grandTotal) {
+        cout << "\nSelect a payment option:\n";
+        cout << "A) Cash\n";
+        cout << "B) Credit Card\n";
+
+        char paymentType;
+        cin >> paymentType;
+
+        if (toupper(paymentType) == 'A' || paymentType == 'a') {
+            cout << "Cash Payment: $" << grandTotal << endl;
+
+            double tender;
+            cout << "Enter the tender amount: $";
+            cin >> tender;
+
+            double tax = 0.0; 
+            double tip = 0.0; 
+            double totalDue = grandTotal + tax + tip;
+            if (tender >= totalDue) {
+                double change = tender - totalDue;
+                cout << "Change: $" << change << endl;
+            } else {
+                cout << "Insufficient payment. Please provide enough tender amount." << endl;
+            }
+        } else {
+            cout << "Credit Card Payment: $" << grandTotal << endl;
+        }
+
+        cout << "Thank you for your payment!" << endl;
+
+        // Generate HTML receipt
+        generateHTMLReceipt(grandTotal);
+    }
+
+    // Function to generate HTML receipt
+    void generateHTMLReceipt(double grandTotal) {
+        double taxRate = 0.08;
+        double tax = grandTotal * taxRate;
+        double total = grandTotal + tax;
+
+        ofstream outFile;
+        outFile.open("receipt.html");
+
+        outFile << "<!DOCTYPE html>\n<html>\n<head>\n<title>Receipt</title>\n</head>\n<body>\n";
+        outFile << "<h1>RECEIPT</h1>\n";
+        outFile << "<h2>-----------------------------------</h2>\n";
+        outFile << "<h2>Itemized List:</h2>\n<ul>\n";
+
+        for (const auto& item : entireMenu) {
+            if (item.getCount() > 0) {
+                outFile << "<li>" << item.getName() << " (" << item.getCount() << "): $"
+                     << (item.getItemCost() * item.getCount()) << "</li>\n";
+            }
+        }
+
+        outFile << "</ul>\n";
+        outFile << "<h2>-----------------------------------</h2>\n";
+        outFile << "<h2>Subtotal: $" << grandTotal << "</h2>\n";
+        outFile << "<h2>Tax (" << (taxRate * 100) << "%): $" << tax << "</h2>\n";
+        outFile << "<h2>Total: $" << total << "</h2>\n";
+        outFile << "</body>\n</html>";
+
+        outFile.close();
+
+        cout << "Receipt generated as 'receipt.html'" << endl;
+    }
+};
+
+int main() {
+    char restartOption;
+
+    do {
+        Menu menu;
+        menu.showMenu();
+        menu.acceptOrder();
+
+        cout << "Enter 'x' to exit the program or any other key to start over: ";
+        cin >> restartOption;
+        cout << endl;
+
+    } while (tolower(restartOption) != 'x');
+
+    return 0;
+}
