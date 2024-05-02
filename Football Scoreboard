@@ -1,0 +1,249 @@
+/*
+Luis Soto 
+2024SP COSC-1437-58002
+04-24-2024
+DR T McMillan
+This Program will prmopt a score board with pre determined data but also allow the user to update the data of teams, city, coaches etc. A very fun program that I learned in my Programming Fundementals II class. 
+ */
+
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <limits>
+
+using namespace std;
+
+class Team
+{
+private:
+  int score;
+  bool homeStatus;
+  string name;
+  string coachName;
+  string homeCity;
+  int timeoutCount;
+
+public:
+  Team()
+  {
+    score = 0;
+    homeStatus = false;
+    timeoutCount = 0;
+    name = "DefaultTeamName";
+    coachName = "DefaultCoachName";
+  }
+  void setScore(int s) { score = s; }
+  void setHomeStatus(bool hs) { homeStatus = hs; }
+  void setName(string n) { name = n; }
+  void setCoachName(string cn) { coachName = cn; }
+  void setHomeCity(string hc) { homeCity = hc; }
+  void setTimeoutCount(int tc) { timeoutCount = tc; }
+  int getScore() const { return score; }
+  bool getHomeStatus() const { return homeStatus; }
+  string getName() const { return name; }
+  string getCoachName() const { return coachName; }
+  string getHomeCity() const { return homeCity; }
+  int getTimeoutCount() const { return timeoutCount; }
+};
+
+class Scoreboard
+{
+  int down;
+  int toGo;
+  int timer_minutes;
+  int timer_seconds;
+  int quarter;
+  int timeouts;
+  Team home;
+  Team visitor;
+
+public:
+  Scoreboard()
+  {
+    down = 1;
+    timer_minutes = 0;
+    timer_seconds = 0;
+  }
+  void setTimer(string time_str)
+  {
+    stringstream ss(time_str);
+    char colon;
+    ss >> timer_minutes >> colon >> timer_seconds;
+  }
+  void setDown(int d) { down = d; }
+  void setToGo(int t) { toGo = t; }
+  void setQuarter(int q) { quarter = q; }
+  void setTimeouts(int t) { timeouts = t; }
+  void setHome(Team h) { home = h; }
+  void setVisitor(Team v) { visitor = v; }
+  void setHomeTimeouts(int t) { home.setTimeoutCount(t); }
+  void setVisitorTimeouts(int t) { visitor.setTimeoutCount(t); }
+  int getDown() const { return down; }
+  int getToGo() const { return toGo; }
+  int getQuarter() const { return quarter; }
+  int getTimeouts() const { return timeouts; }
+  string getTimer() const
+  {
+    stringstream ss;
+    ss << timer_minutes << ":" << (timer_seconds < 10 ? "0" : "") << timer_seconds;
+    return ss.str();
+  }
+  Team getHome() const { return home; }
+  Team getVisitor() const { return visitor; }
+  void ShowScoreboard()
+  {
+    cout << home.getName() << "\t\t\t\t\t\t" << visitor.getName() << endl;
+    cout << "\t\t\t\t\t\tTimer: " << formatTime(timer_minutes * 60 + timer_seconds) << endl;
+    cout << home.getScore() << "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" << visitor.getScore() << endl;
+    cout << "\t\t\t\t\t\t\tQtr: " << quarter << endl;
+    cout << down << " DOWN" << "\t\t\t\t\t\t\t\t\t\t\tTo Go " << toGo << endl;
+    cout << "Home Timeouts: " << home.getTimeoutCount() << "\t\t\t\t\t\tVisitor Timeouts: " << visitor.getTimeoutCount() << endl;
+    cout << "-------------------------------------------------------------------------------------" << endl;
+    cout << "Home City:" << home.getHomeCity() << "\t\t\t\tVisitor City: " << visitor.getHomeCity() << endl;
+    cout << "Home Coach:" << home.getCoachName() << "\t\t\tVisitor Coach:" << visitor.getCoachName() << endl;
+  }
+  string formatTime(int seconds) const
+  {
+    int minutes = seconds / 60;
+    int secs = seconds % 60;
+    return to_string(minutes) + ":" + (secs < 10 ? "0" : "") + to_string(secs);
+  }
+};
+
+int main()
+{
+  Team tOne;
+  Team tTwo;
+  Scoreboard s;
+  char choice;
+  string newName;
+  string newCoachName;
+  string newHomeCity;
+  int newScore;
+  int newDown;
+  int newToGo;
+  int newQuarter;
+  int newTimeouts;
+  string newTimer;
+
+  // Initialize Team One with predetermined information
+  tOne.setName("San Francisco 49er's");
+  tOne.setCoachName("Kyle Shanahan");
+  tOne.setHomeCity("San Francisco");
+  tOne.setScore(42);
+  tOne.setTimeoutCount(0);
+
+  // Initialize Team Two with predetermined information
+  tTwo.setName("Dallas Cowboys");
+  tTwo.setCoachName("Mike McCarthy");
+  tTwo.setHomeCity("Dallas");
+  tTwo.setScore(10);
+  tTwo.setTimeoutCount(0);
+
+  // Initialize Scoreboard with predetermined information and set current game state
+  s.setHome(tOne);
+  s.setVisitor(tTwo);
+  s.setDown(4);
+  s.setToGo(1);
+  s.setQuarter(4);
+  s.setTimeouts(0);
+
+  // Show the scoreboard before user input
+  cout << "Scoreboard:" << endl;
+  s.ShowScoreboard();
+  cout << endl;
+
+ do
+  {
+    cout << "\nMain Menu:\n";
+    cout << "1. Update scores\n";
+    cout << "2. Update game details (team name, coaches, downs, quarters, timeouts etc.)\n";
+    cout << "3. Show scoreboard\n";
+    cout << "4. Exit\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+
+    switch (choice)
+    {
+    case '1':
+      // Update scores
+      cout << "Enter new score for " << tOne.getName() << ": ";
+      cin >> newScore;
+      tOne.setScore(newScore);
+      cout << "Enter new score for " << tTwo.getName() << ": ";
+      cin >> newScore;
+      tTwo.setScore(newScore);
+      // Display updated scoreboard
+      cout << "\nUpdated Scoreboard:" << endl;
+      s.ShowScoreboard();
+      break;
+    case '2':
+      // Update game details
+      cout << "Enter new Home Team: ";
+      cin.ignore();
+      getline(cin, newName);
+      tOne.setName(newName);
+      s.setHome(tOne); 
+
+      cout << "Enter new Visitor Team: ";
+      getline(cin, newName);
+      tTwo.setName(newName);
+      s.setVisitor(tTwo); 
+
+      cout << "Enter new Home Coach: ";
+      getline(cin, newCoachName);
+      tOne.setCoachName(newCoachName);
+
+      cout << "Enter new Visitor Coach: ";
+      getline(cin, newCoachName);
+      tTwo.setCoachName(newCoachName);
+
+      cout << "Enter new Home City: ";
+      getline(cin, newHomeCity);
+      tOne.setHomeCity(newHomeCity);
+
+      cout << "Enter new Visitor City: ";
+      getline(cin, newHomeCity);
+      tTwo.setHomeCity(newHomeCity);
+
+      cout << "Enter new Timer value (MM:SS or M:SS): ";
+      cin >> newTimer;
+      s.setTimer(newTimer);
+
+      cout << "Enter the new quarter: ";
+      cin >> newQuarter;
+      s.setQuarter(newQuarter);
+
+      cout << "Enter the new down: ";
+      cin >> newDown;
+      s.setDown(newDown);
+
+      cout << "Enter the new yards to go: ";
+      cin >> newToGo;
+      s.setToGo(newToGo);
+
+      cout << "Enter Home new timeouts count: ";
+      cin >> newTimeouts;
+      tOne.setTimeoutCount(newTimeouts);
+      s.setHome(tOne); 
+
+      cout << "Enter Visitor new timeouts count: ";
+      cin >> newTimeouts;
+      tTwo.setTimeoutCount(newTimeouts);
+      s.setVisitor(tTwo); 
+
+      // Display updated scoreboard
+      cout << "\nUpdated Scoreboard:" << endl;
+      s.ShowScoreboard();
+      break;
+    case '3':
+      // Display the scoreboard
+      cout << "\nCurrent Scoreboard:" << endl;
+      s.ShowScoreboard();
+      break;
+    }
+
+  } while (choice != '4');
+
+  return 0;
+}
