@@ -1,0 +1,97 @@
+/* Luis Soto
+  Tyson McMillan
+  04/11/2024
+  A program to practice working with multi-dimensional arrays. 
+  showing predetermined data for the following:
+  City, Day, Temp, Cond & then asking for user input for new data.
+*/
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+    // Declaring const for two variable types
+    const int CITY = 2;
+    const int WEEK = 7;
+    // Declaring variables
+    struct TemperatureData {
+        string city;
+        string day;
+        int temperature = 0;
+        string weather; 
+    };
+    // Declare and initialize a two-dimensional array of TemperatureData
+    TemperatureData data[CITY][WEEK];
+
+    string cityNames[CITY] = { "Fort Worth", "Fredericksburg" };
+    string dayNames[WEEK] = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+
+    // Pre-defined temperature data
+    int cityOne[WEEK] = { 81, 65, 67, 73, 77, 79, 74 };
+    int cityTwo[WEEK] = { 84, 69, 69, 72, 79, 79, 77 };
+
+     // Weather data for City One
+    string weatherOne[WEEK] = { "Cloudy", "Partly Cloudy", "Sunny", "Mostly Sunny","Partly Cloudy", "Partly Cloudy", "Showers"}; 
+    // Weather data for City Two
+    string weatherTwo[WEEK] = { "Cloudy", "Mostly Sunny", "Sunny", "Partly Cloudy", "Mostly Sunny", "Partly Cloudy", "Scattered Thunderstorms" }; 
+
+    // Populate the data table. added a little extra weather output data 
+    for (int i = 0; i < CITY; ++i)
+    {
+        for (int j = 0; j < WEEK; ++j)
+        {
+            data[i][j].city = cityNames[i];
+            data[i][j].day = dayNames[j];
+            if (i == 0)
+            {
+                data[i][j].temperature = cityOne[j];
+                data[i][j].weather = weatherOne[j];
+            }
+            else if (i == 1)
+            {  
+                data[i][j].temperature = cityTwo[j];
+                data[i][j].weather = weatherTwo[j];
+            }
+
+        }
+    }
+    // out put the data table
+    cout << "Data Table:\n";
+    cout << "City        |Day    |Temp      |Condition \n";
+    for (int i = 0; i < CITY; ++i)
+    {
+        for (int j = 0; j < WEEK; ++j)
+        {
+            cout << data[i][j].city << ", " << data[i][j].day << ": " << data[i][j].temperature << " degrees, " << data[i][j].weather <<
+         endl;
+        }
+    }
+
+  // User input for new temperature and weather data
+  for (int i = 0; i < CITY; ++i)
+  {
+      cout << "Enter new data for " << cityNames[i] << ":\n";
+      for (int j = 0; j < WEEK; ++j)
+      {
+          cout << "Temperature for " << dayNames[j] << ": ";
+          cin >> data[i][j].temperature;
+          cout << "Weather condition for " << dayNames[j] << ": ";
+          cin >> data[i][j].weather;
+      }
+  }
+
+  // Output the data table
+  cout << "\nData Table:\n";
+  cout << "City        |Day    |Temp      |Condition \n";
+  for (int i = 0; i < CITY; ++i)
+  {
+      for (int j = 0; j < WEEK; ++j)
+      {
+          cout << data[i][j].city << ", " << data[i][j].day << ": " << data[i][j].temperature << " degrees, " << data[i][j].weather << endl;
+      }
+  }
+
+    return 0;
+}
